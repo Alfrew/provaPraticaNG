@@ -1,0 +1,134 @@
+<div class="table-container">
+  <div class="column-toolbar" *ngIf="hasColumnSelect">
+    <mat-form-field class="column-select">
+      <mat-label>{{ 'common.columns' | translate }}</mat-label>
+      <mat-select multiple [(ngModel)]="displayedColumns">
+        <mat-select-trigger>
+          {{ displayedColumns.length }}
+        </mat-select-trigger>
+        <mat-option *ngFor="let column of getSelectableColumns(), let i=index" [disabled]="column.columnDef === 'cta'" [value]="column.columnDef">{{column.header | translate}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="table" mat-table [dataSource]="dataSource" matSort (matSortChange)="emitSortChange($event)" multiTemplateDataRows cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="drop($event)" [cdkDropListDisabled]="!areColumnsOrderable">
+
+      <!-- COLUMN -->
+      <ng-container *ngFor="let column of tableColumns" [matColumnDef]="column.columnDef" [sticky]="column.isSticky">
+
+        <!-- HEADER -->
+        <!-- sortable -->
+        <ng-container *ngIf="column.isSortable && column.sortProperty; else unsortable">
+          <th class="table-header" mat-header-cell *matHeaderCellDef [mat-sort-header]="column.sortProperty" sortActionDescription="Sort by {{column.columnDef}}" cdkDrag>{{ column.header | translate }}</th>
+        </ng-container>
+        <!-- unsortable -->
+        <ng-template #unsortable>
+          <ng-container [ngSwitch]="column.type">
+
+            <!-- default -->
+            <ng-container *ngSwitchDefault>
+              <th class="table-header" mat-header-cell *matHeaderCellDef cdkDrag>{{ column.header | translate }}</th>
+            </ng-container>
+            <!-- expand || cta -->
+            <ng-container *ngSwitchCase="'expand'||'action'">
+              <th class="table-header" mat-header-cell *matHeaderCellDef cdkDrag></th>
+            </ng-container>
+            <!-- checkbox -->
+            <ng-container *ngSwitchCase="'checkbox'">
+              <th class="table-header" mat-header-cell *matHeaderCellDef cdkDrag>
+                <mat-checkbox *ngIf="column.checkboxAll" (change)="toggleAllRows()" [checked]="isAllSelected() == 0" [indeterminate]="isAllSelected() == 1"></mat-checkbox>
+              </th>
+            </ng-container>
+
+          </ng-container>
+        </ng-template>
+
+        <!-- CELL -->
+        <td class="table-cell" [ngClass]="returnColumnClass(column)" mat-cell *matCellDef="let cell">
+          <ng-container [ngSwitch]="column.type">
+            <!-- default -->
+            <ng-container *ngSwitchDefault> {{ getCellValue(cell, column.columnDef) }} </ng-container>
+            <!-- date -->
+            <!-- <ng-container *ngSwitchCase="'date'"> {{ getCellValue(cell, column.columnDef) | userDate }} </ng-container> -->
+            <!-- size -->
+            <!-- <ng-container *ngSwitchCase="'size'"> {{ getCellValue(cell, column.columnDef) | humanSize }} </ng-container> -->
+            <!-- link -->
+            <ng-container *ngSwitchCase="'link'"><a class="link" [routerLink]="[column.url]"> {{ getCellValue(cell, column.columnDef) }} </a></ng-container>
+            <!-- status -->
+            <ng-container *ngSwitchCase="'status'"><mat-icon [ngClass]="cell[column.columnDef] ? 'green-icon' : 'red-icon'" [svgIcon]="getCellValue(cell, column.columnDef) ? 'check' : 'close'"></mat-icon></ng-container>
+            <!-- checkbox -->
+            <ng-container *ngSwitchCase="'checkbox'"><mat-checkbox [checked]="cell.checked" (change)="emitCheckBoxAction(cell)" [disabled]="cell.checkDisabled"></mat-checkbox></ng-container>
+            <!-- expand -->
+            <mat-icon *ngSwitchCase="'expand'" svgIcon="chevron-right" class="expand-icon" [ngClass]="{'active':expandedElement === cell}"></mat-icon>
+            <!-- action -->
+            <ng-container *ngSwitchCase="'action'">
+              <div class="cta-list">
+                <ng-container *ngFor="let icon of column.icons">
+                  <mat-icon class="cta-icon" *ngIf="icon.visible ? icon.visible(cell) : true" [matTooltip]="icon.tooltip | translate" (click)="emitIconAction(cell, icon.actionName); $event.stopPropagation();" svgIcon="{{icon.icon}}"></mat-icon>
+                </ng-container>
+              </div>
+            </ng-container>
+            <!-- custom -->
+            <ng-container *ngSwitchCase="'custom'" [ngTemplateOutlet]="customTemplateRef" [ngTemplateOutletContext]="{$implicit:[cell, column]}"></ng-container>
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- SUB TABLE -->
+      <ng-container matColumnDef="subTable" *ngIf="subTableColumns.length>0">
+        <td class="sub-table-container" mat-cell *matCellDef="let element" [attr.colspan]="subTableColumns.length">
+          <div [@detailExpand]="element == expandedElement && dataSourceExpandableRow.data.length>0 ? 'expanded' : 'collapsed'">
+            <table class="table" mat-table [dataSource]="dataSourceExpandableRow" multiTemplateDataRows>
+
+              <!-- COLUMN -->
+              <ng-container *ngFor="let subColumn of subTableColumns" [matColumnDef]="subColumn.columnDef">
+
+                <!-- HEADER -->
+                <th class="table-header" mat-header-cell *matHeaderCellDef>{{ subColumn.header | translate }}</th>
+
+                <!-- CELL -->
+                <td class="table-cell" [ngClass]="returnColumnClass(subColumn)" mat-cell *matCellDef="let cell">
+                  <ng-container [ngSwitch]="subColumn.type">
+                    <!-- default -->
+                    <ng-container *ngSwitchDefault> {{ getCellValue(cell, subColumn.columnDef) }} </ng-container>
+                    <!-- date -->
+                    <!-- <ng-container *ngSwitchCase="'date'"> {{ getCellValue(cell, subColumn.columnDef) | userDate }} </ng-container> -->
+                    <!-- size -->
+                    <!-- <ng-container *ngSwitchCase="'size'"> {{ getCellValue(cell, subColumn.columnDef) | humanSize }} </ng-container> -->
+                    <!-- link -->
+                    <ng-container *ngSwitchCase="'link'"><a class="link" [routerLink]="[subColumn.url]"> {{ getCellValue(cell, subColumn.columnDef) }} </a></ng-container>
+                    <!-- status -->
+                    <ng-container *ngSwitchCase="'status'"><mat-icon [ngClass]="cell[subColumn.columnDef] ? 'green-icon' : 'red-icon'" [svgIcon]="getCellValue(cell, subColumn.columnDef) ? 'check' : 'close'"></mat-icon></ng-container>
+                    <!-- action -->
+                    <ng-container *ngSwitchCase="'action'">
+                      <div class="cta-list">
+                        <ng-container *ngFor="let icon of subColumn.icons">
+                          <mat-icon class="cta-icon" *ngIf="icon.visible ? icon.visible(cell) : true" [matTooltip]="icon.tooltip | translate" (click)="emitIconAction(cell, icon.actionName); $event.stopPropagation();" svgIcon="{{icon.icon}}"></mat-icon>
+                        </ng-container>
+                      </div>
+                    </ng-container>
+                    <!-- custom -->
+                    <ng-container *ngSwitchCase="'custom'" [ngTemplateOutlet]="customTemplateRef" [ngTemplateOutletContext]="{$implicit:[cell, subColumn]}"></ng-container>
+                  </ng-container>
+                </td>
+              </ng-container>
+
+              <tr class="table-header-row" mat-header-row *matHeaderRowDef="getSubTableColumns(); sticky:true"></tr>
+              <tr class="table-row" mat-row *matRowDef="let row; columns: getSubTableColumns();"></tr>
+            </table>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- ROWS -->
+      <tr class="table-header-row" mat-header-row *matHeaderRowDef="displayedColumns; sticky:true"></tr>
+      <tr class="table-row" mat-row *matRowDef="let row; columns: displayedColumns" (click)="onRowClick(row)"></tr>
+
+      <ng-container *ngIf="subTableColumns.length>0">
+        <tr class="sub-table-row" mat-row *matRowDef="let row; columns: ['subTable']"></tr>
+      </ng-container>
+    </table>
+  </div>
+
+</div>

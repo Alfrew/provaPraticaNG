@@ -5,6 +5,7 @@ export * from "./material/buttons/sm-text-button/sm-text-button.module";
 
 export * from "./material/components/sm-menu/sm-menu.module";
 export * from "./material/components/sm-navbar/sm-navbar.module";
+export * from "./material/components/sm-table/sm-table.module";
 export * from "./material/components/sm-spinner/sm-spinner.module";
 
 export * from "./material/containers/sm-accordion/sm-accordion.module";
