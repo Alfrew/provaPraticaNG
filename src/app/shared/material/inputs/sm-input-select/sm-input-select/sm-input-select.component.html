@@ -10,7 +10,7 @@
           </mat-option>
         </mat-optgroup>
       </mat-select>
-      <mat-error *ngIf="formControl.hasError('required')">{{ 'common.error.required' | translate }}</mat-error>
+      <!-- <mat-error *ngIf="formControl.hasError('required')">{{ 'common.error.required' | translate }}</mat-error> -->
     </mat-form-field>
   </ng-container>
 
@@ -23,7 +23,7 @@
           {{ option.viewValue | translate }}
         </mat-option>
       </mat-select>
-      <mat-error *ngIf="formControl.hasError('required')">{{ 'common.error.required'| translate }}</mat-error>
+      <!-- <mat-error *ngIf="formControl.hasError('required')">{{ 'common.error.required'| translate }}</mat-error> -->
     </mat-form-field>
   </ng-template>
 </ng-container>
