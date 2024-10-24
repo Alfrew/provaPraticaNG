@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
   constructor(private appStatusSRV: AppStatusService) {}
 
   ngOnInit(): void {
-    this.subscribeToService();
+    // this.subscribeToService();
   }
 
   private subscribeToService() {

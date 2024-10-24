@@ -1,0 +1,6 @@
+<div class="map-page-wrapper" *ngIf="mapConfigData">
+  <div class="map-tile-container" [ngClass]="mapConfigData.gridSize">
+    <app-map-tile *ngFor="let tile of mapTileList" [tileType]="tile.groundType"></app-map-tile>
+    <app-player></app-player>
+  </div>
+</div>

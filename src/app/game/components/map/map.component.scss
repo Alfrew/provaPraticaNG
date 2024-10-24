@@ -1,0 +1,18 @@
+.map-page-wrapper {
+  .map-tile-container {
+    max-width: 100%;
+    margin: auto;
+    display: grid;
+    position: relative;
+
+    &.small {
+      grid-template-columns: repeat(10, auto);
+    }
+    &.medium {
+      grid-template-columns: repeat(25, auto);
+    }
+    &.large {
+      grid-template-columns: repeat(40, auto);
+    }
+  }
+}

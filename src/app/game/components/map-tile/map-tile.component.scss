@@ -1,0 +1,12 @@
+.map-tile {
+  aspect-ratio: 1;
+  &.ground {
+    background-color: #8a6240;
+  }
+  &.grass {
+    background-color: #4c6444;
+  }
+  &.water {
+    background-color: #0e263b;
+  }
+}

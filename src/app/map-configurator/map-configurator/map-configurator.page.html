@@ -1,0 +1,15 @@
+<div class="form-wrapper">
+  <form [formGroup]="mapForm" class="map-form">
+    <h1 class="title">Configura la mappa di gioco</h1>
+
+    <sm-input-number formControlName="waterPercentage" label="Percentuale caselle marine (10-33%)" [isPercentage]="true"></sm-input-number>
+    <sm-input-number formControlName="grassPercentage" label="Percentuale caselle erbose (10-33%)" [isPercentage]="true"></sm-input-number>
+    <sm-input-number formControlName="groundPercentage" label="Percentuale caselle terreno (10-33%)" [isPercentage]="true"></sm-input-number>
+    <sm-input-select formControlName="gridSize" label="Grandezza Mappa" [optionList]="selectGridSizeList"></sm-input-select>
+
+    <div class="form-cta">
+      <sm-flat-button label="Resetta form" color="warn" (buttonClick)="resetForm()"></sm-flat-button>
+      <sm-flat-button label="Inizia Partita" color="primary" [isDisabled]="mapForm.invalid" (buttonClick)="saveMapAndPlay()"></sm-flat-button>
+    </div>
+  </form>
+</div>

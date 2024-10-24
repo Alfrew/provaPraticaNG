@@ -12,7 +12,7 @@ import { HttpClient, HttpClientModule } from "@angular/common/http";
 // other imports
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { MatIconModule } from "@angular/material/icon";
-import { SmNavbarModule, SmSpinnerModule } from "@shared";
+import { SmNavbarModule } from "@shared";
 
 @NgModule({
   declarations: [AppComponent],
@@ -30,7 +30,6 @@ import { SmNavbarModule, SmSpinnerModule } from "@shared";
       },
     }),
     MatIconModule,
-    SmSpinnerModule,
     SmNavbarModule,
   ],
   providers: [],
